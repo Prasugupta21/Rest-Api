@@ -1,6 +1,7 @@
 
 const express=require("express");
 const fs=require("fs");
+const bodyParser="body-parser";
 const users=require("./usersData.json");
 
 
@@ -18,29 +19,24 @@ app.use(express.urlencoded({extended:false}));
 //     </ul>`;
 //     res.send(html);
 //  });
-app.use((req,res,next)=>{
-    console.log("hello from middleware");
-    req.myUserName="prasu"
-    next();
-});
-
-app.use((req,res,next)=>{
-    console.log("hello from middleware 2",req.myUserName);
- next();
-});
 
 
+app.use
 app.get("/api/users",(req,res)=>{
-console.log("i am in get route ",req.myUserName)
+    res.setHeader("X-myName","Prasu Gupta");
+    // always use X-to custom Header
     res.json(users);
 });
 app.post("/api/users",(req,res)=>{
  
     const body=req.body;
+    if(!body || !body.first_name || !body.email || !body.gender || !body.last_name || !body.ip_address){
+        res.status(400).json({msg:"all fields are required"});
+    }
     // console.log("Body " ,body);
     users.push({...body,id:users.length+1});
     fs.writeFile("./usersData.json",JSON.stringify(users),(err,data)=>{
-        res.json({status:"success",id:users.length});
+        res.status(201).json({status:"success",id:users.length});
 
     });
 
@@ -49,6 +45,9 @@ app.route("/api/users/:id")
 .get((req,res)=>{
 const id=Number(req.params.id);
 const user=users.find((user)=>user.id===id);
+if(!user){
+    res.status(404).json({msg:"user not found"});
+}
 return res.json(user);
         })
         .put((req,res)=>{
