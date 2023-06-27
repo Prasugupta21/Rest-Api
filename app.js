@@ -18,7 +18,16 @@ app.use(express.urlencoded({extended:false}));
 //     </ul>`;
 //     res.send(html);
 //  });
+app.use((req,res,next)=>{
+    console.log("hello from middleware");
+    req.myUserName="prasu"
+    next();
+});
 
+app.use((req,res,next)=>{
+    console.log("hello from middleware 2",req.myUserName);
+ next();
+});
 
 
 app.get("/api/users",(req,res)=>{
